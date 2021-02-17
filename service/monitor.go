@@ -11,9 +11,13 @@ import (
 	"github.com/gorilla/websocket"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+//making objectID global
+var docID interface{}
 
 //ConnectTODatabase is used initalize connection to database
 func ConnectTODatabase() *mongo.Database {
@@ -29,6 +33,9 @@ func ConnectTODatabase() *mongo.Database {
 //MonitorStream is used to monitor collection
 func MonitorStream(database *mongo.Database, c chan<- string, objectid interface{}) {
 	collection := database.Collection(os.Getenv("dbCollection"))
+
+	docID = objectid
+
 	pipeline := bson.D{
 		{
 			Key: "$match", Value: bson.D{
@@ -107,5 +114,30 @@ func ListenFormFrontEnd(conn *websocket.Conn) {
 		}
 		fmt.Println(">>>:", string(msg))
 
+		update := bson.M{"$set": bson.M{"reply": string(msg)}}
+
+		go addReply(update)
+
 	}
+}
+
+func addReply(update primitive.M) {
+	db := ConnectTODatabase()
+	collection := db.Collection(os.Getenv("dbCollection"))
+
+	filter := bson.M{"_id": bson.M{"$eq": docID}}
+
+	result, err := collection.UpdateOne(
+		context.Background(),
+		filter,
+		update,
+	)
+
+	if err != nil {
+		fmt.Println("Error While Replying", err)
+	} else {
+		fmt.Println("Reply Added Successfully", result)
+
+	}
+
 }

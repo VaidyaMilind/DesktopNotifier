@@ -30,7 +30,7 @@ func main() {
 		log.SetFlags(0)
 		http.HandleFunc("/echo", controller.Echo)
 		http.HandleFunc("/", controller.HomePage)
-		fmt.Print("Listening")
+		fmt.Println("Listening")
 		log.Fatal(http.ListenAndServe(*addr, nil))
 		//service.GetDetailForUser("milind")
 		//userLogin()
