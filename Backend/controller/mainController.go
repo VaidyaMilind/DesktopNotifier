@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"Notification/service"
+	"Notification/Backend/service"
 	"fmt"
 	"log"
 	"net/http"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Notification/controller"
+	"Notification/Backend/controller"
 	"flag"
 	"fmt"
 	"log"
